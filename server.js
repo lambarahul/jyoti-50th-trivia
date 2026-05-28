@@ -200,7 +200,8 @@ function getProjectorHTML() {
         </div>
 
         <script>
-            const ws = new WebSocket('ws://' + window.location.host);
+            const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const ws = new WebSocket(protocol + window.location.host);
             function sendAction(action) {
                 ws.send(JSON.stringify({ type: 'host_action', action: action }));
             }
