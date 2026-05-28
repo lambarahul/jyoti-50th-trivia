@@ -11,7 +11,7 @@ const games = {
                 type: "photo trivia",
                 question: "Festive fireworks! What major milestone or holiday was Jyoti celebrating in her childhood photo with her parents?",
                 imageUrl: "https://i.ibb.co/JyotiPhoto1.jpg",
-                options: ["A) Her 5th Birthday", "B) Diwali", "C) New Year\"s Eve", "D) Her first day of school"],
+                options: ["A) Her 5th Birthday", "B) Diwali", "C) New Year's Eve", "D) Her first day of school"],
                 correct: 1
             },
             {
@@ -229,11 +229,11 @@ function getLandingPageHTML() {
             <h1>Welcome to Jyoti's 50th Birthday Games!</h1>
             <p>Choose a game to begin the fun:</p>
             <div class="game-buttons">
-                <button onclick="location.href=\`/projector/generation-gap\`">Generation Gap (Host)</button>
-                <button onclick="location.href=\`/play/generation-gap\`">Generation Gap (Player)</button>
+                <button onclick="location.href='/projector/generation-gap'">Generation Gap (Host)</button>
+                <button onclick="location.href='/play/generation-gap'">Generation Gap (Player)</button>
                 <br>
-                <button onclick="location.href=\`/projector/jyoti-trivia\`">Jyoti Trivia (Host)</button>
-                <button onclick="location.href=\`/play/jyoti-trivia\`">Jyoti Trivia (Player)</button>
+                <button onclick="location.href='/projector/jyoti-trivia'">Jyoti Trivia (Host)</button>
+                <button onclick="location.href='/play/jyoti-trivia'">Jyoti Trivia (Player)</button>
             </div>
         </div>
     </body>
@@ -295,9 +295,9 @@ function getProjectorHTML(gameId) {
                 ${gameId === "generation-gap" ? `
                 <div class="team-controls">
                     <div id="team1-score" class="team-score-display">Team 1 Score: 0</div>
-                    <button onclick="sendAction(\'add-team-score-1\')">Add Score Team 1</button>
+                    <button onclick="sendAction('add-team-score-1')">Add Score Team 1</button>
                     <div id="team2-score" class="team-score-display">Team 2 Score: 0</div>
-                    <button onclick="sendAction(\'add-team-score-2\')">Add Score Team 2</button>
+                    <button onclick="sendAction('add-team-score-2')">Add Score Team 2</button>
                 </div>
                 ` : ``} 
             </div>
@@ -309,72 +309,72 @@ function getProjectorHTML(gameId) {
         </div>
 
         <div class="control-dock">
-            <button class="btn" onclick="location.href=\'/home\'">🏠 Home</button>
-            <button class="btn" onclick="sendAction(\'back\')">⏮️ Back</button>
-            <button class="btn" onclick="sendAction(\'hint\')" style="background:#8a6d1c; color:white;">💡 Hint</button>
-            <button class="btn" onclick="sendAction(\'reveal\')" style="background:#2e7d32; color:white;">✅ Reveal Answer</button>
-            <button class="btn" onclick="sendAction(\'next\')">Next ⏭️</button>
+            <button class="btn" onclick="location.href='/home'">🏠 Home</button>
+            <button class="btn" onclick="sendAction('back')">⏮️ Back</button>
+            <button class="btn" onclick="sendAction('hint')" style="background:#8a6d1c; color:white;">💡 Hint</button>
+            <button class="btn" onclick="sendAction('reveal')" style="background:#2e7d32; color:white;">✅ Reveal Answer</button>
+            <button class="btn" onclick="sendAction('next')">Next ⏭️</button>
         </div>
 
         <script>
-            const gameId = \'${gameId}\';
-            const protocol = window.location.protocol === \'https:\' ? \'wss://\' : \'ws://\';
-            const ws = new WebSocket(protocol + window.location.host + \'?gameId=\' + gameId);
+            const gameId = '${gameId}';
+            const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const ws = new WebSocket(protocol + window.location.host + '?gameId=' + gameId);
             
             ws.onopen = () => {
                 // Send an initial join message for the projector to receive state updates
-                ws.send(JSON.stringify({ type: \'join\', name: \'Projector\', gameId: gameId }));
+                ws.send(JSON.stringify({ type: 'join', name: 'Projector', gameId: gameId }));
             };
 
             function sendAction(action) {
-                ws.send(JSON.stringify({ type: \'host_action\', action: action, gameId: gameId }));
+                ws.send(JSON.stringify({ type: 'host_action', action: action, gameId: gameId }));
             }
 
             ws.onmessage = (event) => {
                 const state = JSON.parse(event.data);
-                document.getElementById(\'round-subtitle\').innerText = "ROUND " + state.question.round + " • " + state.question.type.toUpperCase();
-                document.getElementById(\'question-text\').innerText = state.question.question;
+                document.getElementById('round-subtitle').innerText = "ROUND " + state.question.round + " • " + state.question.type.toUpperCase();
+                document.getElementById('question-text').innerText = state.question.question;
                 
-                const questionImage = document.getElementById(\'question-image\');
+                const questionImage = document.getElementById('question-image');
                 if (state.question.imageUrl) {
                     questionImage.src = state.question.imageUrl;
-                    questionImage.style.display = \'block\';
+                    questionImage.style.display = 'block';
                 } else {
-                    questionImage.style.display = \'none\';
+                    questionImage.style.display = 'none';
                 }
 
-                const hintBox = document.getElementById(\'hint-box\');
+                const hintBox = document.getElementById('hint-box');
                 if (state.question.hint && state.showHintState) {
-                    hintBox.style.display = \'block\';
+                    hintBox.style.display = 'block';
                     hintBox.innerText = "Hint: " + state.question.hint;
                 } else {
-                    hintBox.style.display = \'none\';
+                    hintBox.style.display = 'none';
                 }
 
-                const matrix = document.getElementById(\'options-matrix\');
-                matrix.innerHTML = \'\';
+                const matrix = document.getElementById('options-matrix');
+                matrix.innerHTML = '';
                 state.question.options.forEach((opt, idx) => {
-                    const box = document.createElement(\'div\');
-                    box.className = \'opt-box\';
+                    const box = document.createElement('div');
+                    box.className = 'opt-box';
                     box.innerText = opt;
                     if (state.showAnswersState && idx === state.question.correct) {
-                        box.className += \' correct\';
+                        box.className += ' correct';
                     }
                     matrix.appendChild(box);
                 });
 
-                const list = document.getElementById(\'player-list\');
-                list.innerHTML = \'\';
+                const list = document.getElementById('player-list');
+                list.innerHTML = '';
                 // Display regular players first
                 state.players.filter(p => !p.isTeam).sort((a,b) => b.score - a.score).forEach(p => {
-                    list.innerHTML += \'<div class="player-item"><span>\' + (p.hasAnswered ? \'<span class="status-dot">✓</span>\' : \'\') + p.name + \'</span><span>\' + p.score + \'</span></div>\';
+                    list.innerHTML += '<div class="player-item"><span>' + (p.hasAnswered ? '<span class="status-dot">✓</span>' : '') + p.name + '</span><span>' + p.score + '</span></div>';
                 });
                 // Display team scores if available for generation-gap
-                if (gameId === \'generation-gap\') {
-                    const team1 = state.players.find(p => p.name === \'Team 1\');
-                    const team2 = state.players.find(p => p.name === \'Team 2\');
-                    if (team1) document.getElementById(\'team1-score\').innerText = `Team 1 Score: ${team1.score}`;
-                    if (team2) document.getElementById(\'team2-score\').innerText = `Team 2 Score: ${team2.score}`;
+                if (gameId === 'generation-gap') {
+                    const team1 = state.players.find(p => p.name === 'Team 1');
+                    const team2 = state.players.find(p => p.name === 'Team 2');
+                    if (team1) document.getElementById('team1-score').innerText = "Team 1 Score: " + team1.score;
+                    if (team2) document.getElementById('team2-score').innerText = "Team 2 Score: " + team2.score;
                 }
             };
         </script>
@@ -391,7 +391,7 @@ function getPlayerHTML(gameId) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Jyoti\'s Game Pad</title>
+        <title>Jyoti's Game Pad</title>
         <style>
             body { background: #111; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
             .question-display { font-size: 1.5em; font-weight: bold; color: #D4AF37; margin-bottom: 20px; min-height: 3em; display: flex; align-items: center; justify-content: center; text-align: center; }
@@ -409,7 +409,7 @@ function getPlayerHTML(gameId) {
     </head>
     <body>
         <div id="login-card" class="login-card">
-            <h2 style="color:#D4AF37; margin-bottom: 5px;">JYOTI\'S 50TH</h2>
+            <h2 style="color:#D4AF37; margin-bottom: 5px;">Jyoti's 50TH</h2>
             <p style="color:#888; margin-top:0; margin-bottom:25px;">Wireless Buzz-In System</p>
             <input type="text" id="player-nickname" placeholder="Your Name..." maxlength="12"><br>
             <button class="btn-join" onclick="initiateConnection()">JOIN GAME</button>
@@ -427,42 +427,42 @@ function getPlayerHTML(gameId) {
         </div>
 
         <script>
-            const gameId = \'${gameId}\';
+            const gameId = '${gameId}';
             let socket;
             function initiateConnection() {
-                const name = document.getElementById(\'player-nickname\').value.trim();
-                if(!name) return alert(\'Enter a nickname first!\');
+                const name = document.getElementById('player-nickname').value.trim();
+                if(!name) return alert('Enter a nickname first!');
                 
-                const protocol = window.location.protocol === \'https:\' ? \'wss://\' : \'ws://\';
-                socket = new WebSocket(protocol + window.location.host + \'?gameId=\' + gameId);
+                const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+                socket = new WebSocket(protocol + window.location.host + '?gameId=' + gameId);
                 
                 socket.onopen = () => {
-                    socket.send(JSON.stringify({ type: \'join\', name: name, gameId: gameId }));
-                    document.getElementById(\'login-card\').style.display = \'none\';
-                    document.getElementById(\'pad-layout\').style.display = \'flex\';
+                    socket.send(JSON.stringify({ type: 'join', name: name, gameId: gameId }));
+                    document.getElementById('login-card').style.display = 'none';
+                    document.getElementById('pad-layout').style.display = 'flex';
                 };
 
                 socket.onmessage = (event) => {
                     const state = JSON.parse(event.data);
-                    document.getElementById(\'question-display\').innerText = state.question.question;
-                    const targets = document.querySelectorAll(\'\\.grid-inputs button\');
+                    document.getElementById('question-display').innerText = state.question.question;
+                    const targets = document.querySelectorAll('.grid-inputs button');
                     const userState = state.players.find(p => p.name === name);
                     
                     if (state.showAnswersState) {
-                        document.getElementById(\'status-banner\').innerText = "Round over! See the big screen.";
+                        document.getElementById('status-banner').innerText = "Round over! See the big screen.";
                         targets.forEach(b => b.disabled = true);
                     } else if (userState && userState.hasAnswered) {
-                        document.getElementById(\'status-banner\').innerText = "Answer locked in. Waiting...";
+                        document.getElementById('status-banner').innerText = "Answer locked in. Waiting...";
                         targets.forEach(b => b.disabled = true);
                     } else {
-                        document.getElementById(\'status-banner\').innerText = "Tap your answer now!";
+                        document.getElementById('status-banner').innerText = "Tap your answer now!";
                         targets.forEach(b => b.disabled = false);
                     }
                 };
             }
 
             function submitChoice(num) {
-                socket.send(JSON.stringify({ type: \'submit_answer\', answer: num, gameId: gameId }));
+                socket.send(JSON.stringify({ type: 'submit_answer', answer: num, gameId: gameId }));
             }
         </script>
     </body>
@@ -474,11 +474,11 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
     console.log(`\n======================================================`);
-    console.log(`🎉 JYOTI\'S MULTIPLAYER CLOUD ENGINE IS LIVE ONLINE!`);
+    console.log(`🎉 JYOTI'S MULTIPLAYER CLOUD ENGINE IS LIVE ONLINE!`);
     console.log(`======================================================`);
-    console.log(`🖥️  Landing Page: /home`);
-    console.log(`🖥️  Host Projector URL (Generation Gap): /projector/generation-gap`);
+    console.log(`🖥  Landing Page: /home`);
+    console.log(`🖥  Host Projector URL (Generation Gap): /projector/generation-gap`);
     console.log(`📱 Guest Controller URL (Generation Gap): /play/generation-gap\n`);
-    console.log(`🖥️  Host Projector URL (Jyoti Trivia): /projector/jyoti-trivia`);
+    console.log(`🖥  Host Projector URL (Jyoti Trivia): /projector/jyoti-trivia`);
     console.log(`📱 Guest Controller URL (Jyoti Trivia): /play/jyoti-trivia\n`);
 });
