@@ -7,6 +7,7 @@ const triviaQuestions = [
         round: 1,
         type: "photo trivia",
         question: "Festive fireworks! What major milestone or holiday was Jyoti celebrating in her childhood photo with her parents?",
+        imageUrl: "https://i.ibb.co/JyotiPhoto1.jpg", // Example Google Photos link
         options: ["A) Her 5th Birthday", "B) Diwali", "C) New Year's Eve", "D) Her first day of school"],
         correct: 1 // B) Diwali
     },
@@ -14,6 +15,7 @@ const triviaQuestions = [
         round: 1,
         type: "photo trivia",
         question: "Look at that focus! Exactly how old was Jyoti when she was caught showing off her snooker skills with Rahul in August 2016?",
+        imageUrl: "https://i.ibb.co/JyotiPhoto2.jpg", // Example Google Photos link
         options: ["A) 38 years old", "B) 40 years old", "C) 42 years old", "D) 45 years old"],
         correct: 1 // B) 40 years old
     },
@@ -21,6 +23,7 @@ const triviaQuestions = [
         round: 1,
         type: "photo trivia",
         question: "Jyoti took on the snowy slopes of Mount Baw Baw in 2018. How old was our resident stuntwoman in this photo?",
+        imageUrl: "https://i.ibb.co/JyotiPhoto3.jpg", // Example Google Photos link
         options: ["A) 39 years old", "B) 41 years old", "C) 42 years old", "D) 44 years old"],
         correct: 2 // C) 42 years old
     },
@@ -157,6 +160,7 @@ function getProjectorHTML() {
             .round-title { color: #aaa; font-style: italic; font-size: 1em; margin: 2px 0 0 0; }
             .main-arena { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; height: 74vh; box-sizing: border-box; position: relative; }
             .game-card { background: #1a1a1a; border: 2px solid #222; border-radius: 15px; padding: 35px; width: 100%; max-width: 900px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box; margin-right: 260px; }
+            .question-image { max-width: 100%; height: auto; border-radius: 8px; margin-top: 15px; margin-bottom: 15px; }
             .question-text { font-size: 2em; font-weight: bold; line-height: 1.4em; }
             .hint-box { background: rgba(212, 175, 55, 0.12); border: 2px dashed #D4AF37; padding: 12px; margin: 20px auto; border-radius: 8px; font-size: 1.3em; max-width: 550px; display: none; }
             .options-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
@@ -182,6 +186,7 @@ function getProjectorHTML() {
         <div class="main-arena">
             <div class="game-card">
                 <div id="question-text" class="question-text">Syncing with backend...</div>
+                <img id="question-image" class="question-image" style="display:none;" alt="Question Image">
                 <div id="hint-box" class="hint-box"></div>
                 <div class="options-matrix" id="options-matrix"></div>
             </div>
@@ -211,6 +216,15 @@ function getProjectorHTML() {
                 document.getElementById('round-subtitle').innerText = "ROUND " + state.question.round + " • " + state.question.type.toUpperCase();
                 document.getElementById('question-text').innerText = state.question.question;
                 
+                // Image Display
+                const questionImage = document.getElementById('question-image');
+                if (state.question.imageUrl) {
+                    questionImage.src = state.question.imageUrl;
+                    questionImage.style.display = 'block';
+                } else {
+                    questionImage.style.display = 'none';
+                }
+
                 // Hints Engine
                 const hintBox = document.getElementById('hint-box');
                 if (state.question.hint && state.showHintState) {
@@ -256,7 +270,8 @@ function getPlayerHTML() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Jyoti's Game Pad</title>
         <style>
-            body { background: #111; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+            body { background: #111; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; box-sizing: border-box; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+            .question-display { font-size: 1.5em; font-weight: bold; color: #D4AF37; margin-bottom: 20px; min-height: 3em; display: flex; align-items: center; justify-content: center; text-align: center; }
             .login-card { max-width: 320px; margin: 0 auto; width: 100%; }
             input { padding: 15px; font-size: 1.2em; border-radius: 8px; border: none; width: 100%; box-sizing: border-box; margin-bottom: 15px; text-align: center;}
             .btn-join { background: #D4AF37; color: #111; border: none; padding: 15px; font-size: 1.2em; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer;}
@@ -278,6 +293,7 @@ function getPlayerHTML() {
         </div>
 
         <div id="pad-layout" class="pad-layout">
+            <div id="question-display" class="question-display"></div>
             <div id="status-banner" class="status-banner">Syncing...</div>
             <div class="grid-inputs">
                 <button class="pad-trigger btn-a" onclick="submitChoice(0)">A</button>
@@ -304,6 +320,7 @@ function getPlayerHTML() {
 
                 socket.onmessage = (event) => {
                     const state = JSON.parse(event.data);
+                    document.getElementById('question-display').innerText = state.question.question;
                     const targets = document.querySelectorAll('.grid-inputs button');
                     const userState = state.players.find(p => p.name === name);
                     
