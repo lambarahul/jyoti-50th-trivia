@@ -293,7 +293,8 @@ function getPlayerHTML() {
                 const name = document.getElementById('player-nickname').value.trim();
                 if(!name) return alert('Enter a nickname first!');
                 
-                socket = new WebSocket('ws://' + window.location.host);
+                const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+                socket = new WebSocket(protocol + window.location.host);
                 
                 socket.onopen = () => {
                     socket.send(JSON.stringify({ type: 'join', name: name }));
